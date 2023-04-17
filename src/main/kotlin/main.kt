@@ -1,5 +1,6 @@
 package ru.netology
 
+
 data class Likes(
     val count: Int
 )
@@ -22,7 +23,7 @@ data class Post(
     val views: Post?,
     val post_type: Post?,
     val post_source: Post?,
-    val attachments: Array<Attachment>? = emptyArray(), //var attachments: Array<Attachment> = emptyArray<Attachment>(), // из вопросов
+    val attachments: Array<Attachment>? = emptyArray(), //var attachments: Array<Attachment> = emptyArray<Attachment>()
     val geo: Long,
     val signer_id: Long,
     var copyHistory: Post?,
@@ -37,6 +38,19 @@ data class Post(
 object WallService {
     private var posts = emptyArray<Post>()
     private var lastId = 0
+    private var comments = emptyArray<Comment>()
+    private var postId: Int = 1
+
+    fun createComment(comment: Comment, postId: Int): Comment {
+        for (post in posts) {
+            if (post.idPost == postId) {
+                comments += comment
+                return comments.last()
+            }
+        }
+        throw PostNotFoundException("Такой пост не найден")
+    }
+
     fun clear() {
         posts = emptyArray()
         lastId = 0   // также здесь нужно сбросить счетчик для id постов, если он у вас используется
@@ -57,7 +71,6 @@ object WallService {
         }
         return false
     }
-
 
     fun printPosts() {
         for (post in posts) {
@@ -95,7 +108,7 @@ fun main() {
             isPinned = false,
             copyHistory = null,
             markedAsAds = false
-          )
+        )
     )
     WallService.add(
         Post(
@@ -231,5 +244,20 @@ fun main() {
     val attachmentPhoto1 = PhotoAttachment(photo1)
     val attachmentNote1 = NoteAttachment(note1)
     val attachmentGift1 = GiftAttachment(gift1)
+
+    val comment1 = Comment(
+        1,
+        "Some Comment",
+        87345,
+        11655465,
+        null,
+        65465464,
+        646465,
+        arrayOf(attachmentVideo1),
+        null,
+    )
+    WallService.createComment(comment1, 1)
+    println(comment1.text)
+
 }
 
